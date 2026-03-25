@@ -1,7 +1,7 @@
 # Project Aegis: Epistemic Decision Gating
 
 **Aegis** is a deterministic decision governance layer for autonomous systems (Trading, ML Deployment, Robotics).  
-It enforces **truth-first execution** by modeling uncertainty, missingness, and signal integrity—blocking actions when the environment is unstable.
+It enforces **truth-first execution** by modeling uncertainty, missingness, and signal integrity blocking actions when the environment is unstable.
 
 ---
 
