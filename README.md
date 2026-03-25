@@ -83,25 +83,65 @@ def run_simulation():
     print("Simulation Complete: Aegis detected instability and enforced a SUBSTRATE_FREEZE.")
 
 
+if __name__ == "__main__":
+    run_simulation()
 
-
-
-
+```
 
 
 ## Aegis Troubleshooting & Epistemic Calibration
+
 This guide explains how to interpret the mathematical outputs of the Aegis Arbiter and how to resolve common system deadlocks.
 
-1. The Decision Matrix: Interpreting $P_{net}$The $P_{net}$ score (Net Epistemic Pressure) represents the "Margin of Safety." While can_execute is a binary gate, the underlying score dictates the quality of the environment.Pnet​ RangeStatusMeaningOperational Action> 2.0GOStrong Consensus. High-tier facts are present with near-zero entropy.Standard automated execution.1.0 to 2.0GONominal Safety. Basic requirements met; standard noise levels.Standard automated execution.0.0 to 1.0CONDITIONAL_GOFragile State. Proponent outweighs Dissenter, but the margin is thin.Warning: Reduce position size / increase monitoring.-0.5 to 0.0INSUFFICIENTOpaque Reality. Evidence is missing or too stale to calculate a safe path.Hold: System waits for fresh artifacts.< -0.5BLOCKActive Hostility. Risks or tool failures outweigh successes.Stop: Hard execution block. Investigate logs.
 
-2. Common System States & FixesState: Stuck in INSUFFICIENT_EVIDENCESymptom: The system refuses to move to GO despite "good" data.The Cause: A Critical flag is active in the sc.missingness registry. Aegis follows a Short-Circuit Invariant: if a required probe is missing, no amount of other "Success" data can override it.
-    Resolution:
 
-    1.  Check AegisAction.dominant_anchors to see which probe is missing.
+## 1. The Decision Matrix: Interpreting $P_{net}$The $P_{net}$ score (Net Epistemic Pressure) represents the "Margin of Safety." While can_execute is a binary gate, the underlying score dictates the quality of the environment.
 
-    2.  Verify the sensor/tool is actually reporting to the Gateway.
+Pnet​           Range	       Status	            Meaning	                                                    Operational Action
+> 2.0	       GO	           Strong Consensus.    High-tier facts are present with near-zero entropy.	        Standard automated execution.
+1.0 to 2.0	   GO	           Nominal Safety.      Basic requirements met; standard noise levels.	            Standard automated execution.
+0.0 to 1.0	   CONDITIONAL_GO  Fragile State.       Proponent outweighs Dissenter, but the margin is thin.      Warning: Reduce position size / increase monitoring.
+-0.5 to 0.0	   INSUFFICIENT	   Opaque Reality.      Evidence is missing or too stale to calculate a safe path.  Hold: System waits for fresh artifacts.
+< -0.5	       BLOCK	       Active Hostility.    Risks or tool failures outweigh successes.	                Stop: Hard execution block. Investigate logs.
 
-    3.  If the probe is no longer relevant, update your TargetingEngine to remove the requirement.State: SUBSTRATE_FREEZE (The Thrash Trigger)Symptom: The status flips to SUBSTRATE_FREEZE and stops all processing.The Cause: The ConvergenceMonitor detected too many status flips (e.g., GO -> BLOCK -> GO) within the defined window. This indicates Sensory Turbulence.Resolution: 1.  Do not immediately restart. Identify the "Flapping" sensor.2.  Wait for the environment to stabilize (The "Cooling Period").3.  Use a Tier-4 Assertion (Human Override) to acknowledge the volatility and force a transition to DIAGNOSTIC_MODE.State: BLOCK despite Human (Tier-4) SuccessSymptom: You manually told the system it is "OK," but it still returns BLOCK.The Cause: Tier Weighting. A Tier-4 Assertion has a weight of 0.2. A Tier-1 Tool Crash or Risk has a weight of 1.0.Resolution: Aegis is designed to trust automated, signed telemetry over human "guesses." To override a Tier-1 Risk, you must provide multiple corroborating assertions or fix the underlying Tier-1 evidence source.3. Tuning Your PolicyIf Aegis is being "too sensitive" or "too reckless," adjust your Policy thresholds:Increase go_threshold: If you want the system to be more skeptical (requires more evidence to act).Decrease block_threshold: If you want to allow the system to tolerate more minor risks before stopping.Adjust ConvergenceMonitor(threshold=N): Increase N if your environment is naturally noisy but you want to avoid frequent Freezes.
+## 2. Common System States & Fixes
 
-if __name__ == "__main__":
-    run_simulation()
+
+State: Stuck in INSUFFICIENT_EVIDENCE
+Symptom: The system refuses to move to GO despite "good" data.
+
+The Cause: A Critical flag is active in the sc.missingness registry. Aegis follows a Short-Circuit Invariant: if a required probe is missing, no amount of other "Success" data can override it.
+
+Resolution: 
+1.  Check AegisAction.dominant_anchors to see which probe is missing.
+2.  Verify the sensor/tool is actually reporting to the Gateway.
+3.  If the probe is no longer relevant, update your TargetingEngine to remove the requirement.
+
+State: SUBSTRATE_FREEZE (The Thrash Trigger)
+Symptom: The status flips to SUBSTRATE_FREEZE and stops all processing.
+
+The Cause: The ConvergenceMonitor detected too many status flips (e.g., GO -> BLOCK -> GO) within the defined window. This indicates Sensory Turbulence.
+
+Resolution: 
+1.  Do not immediately restart. Identify the "Flapping" sensor.
+2.  Wait for the environment to stabilize (The "Cooling Period").
+3.  Use a Tier-4 Assertion (Human Override) to acknowledge the volatility and force a transition to DIAGNOSTIC_MODE.
+
+State: BLOCK despite Human (Tier-4) Success
+Symptom: You manually told the system it is "OK," but it still returns BLOCK.
+
+The Cause: Tier Weighting. A Tier-4 Assertion has a weight of 0.2. A Tier-1 Tool Crash or Risk has a weight of 1.0.
+
+Resolution: Aegis is designed to trust automated, signed telemetry over human "guesses." To override a Tier-1 Risk, you must provide multiple corroborating assertions or fix the underlying Tier-1 evidence source.
+
+
+
+## 3. Tuning Your Policy
+
+If Aegis is being "too sensitive" or "too reckless," adjust your Policy thresholds:
+
+Increase go_threshold: If you want the system to be more skeptical (requires more evidence to act).
+
+Decrease block_threshold: If you want to allow the system to tolerate more minor risks before stopping.
+
+Adjust ConvergenceMonitor(threshold=N): Increase N if your environment is naturally noisy but you want to avoid frequent Freezes.
