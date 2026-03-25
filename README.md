@@ -141,52 +141,51 @@ graph TD
 
 **1. INSUFFICIENT_EVIDENCE**
 
-Symptom: System won’t move to GO
+- Symptom: System won’t move to GO
 
-Cause: Missing critical probe
+- Cause: Missing critical probe
 
-Fix:
+- Fix:
 
-Check dominant_anchors
-Verify sensor reporting
-Remove stale requirements if needed
+   Check dominant_anchors
+   Verify sensor reporting
+   Remove stale requirements if needed
 
 **2. SUBSTRATE_FREEZE**
 
-Symptom: System halts execution
+- Symptom: System halts execution
 
-Cause: Rapid oscillation (thrashing)
+- Cause: Rapid oscillation (thrashing)
 
-Fix:
+- Fix:
 
-Identify unstable signal
-Wait for stabilization
-Optionally apply Tier-4 override → DIAGNOSTIC mode
+   Identify unstable signal
+   Wait for stabilization
+   Optionally apply Tier-4 override → DIAGNOSTIC mode
 
 **3. BLOCK Despite Human Override**
 
-Symptom: You say “GO,” system still blocks
+- Symptom: You say “GO,” system still blocks
 
-Cause: Tier weighting
+- Cause: Tier weighting
 
-Tier 1 = strong
-Tier 4 = weak
+   Tier 1 = strong
+   Tier 4 = weak
 
-Fix:
+- Fix:
 
-Provide corroborating evidence
-Fix underlying system signal
-Policy Tuning
+   Provide corroborating evidence
+   Fix underlying system signal
+   Policy Tuning
 
-Adjust system sensitivity:
+   Adjust system sensitivity:
+   
+   - Increase go_threshold → more conservative
+   - Decrease block_threshold → more tolerant
+   - Increase ConvergenceMonitor.threshold → reduce freeze sensitivity
+ 
 
-Increase go_threshold → more conservative
-Decrease block_threshold → more tolerant
-Increase ConvergenceMonitor.threshold → reduce freeze sensitivity
-What Aegis Actually Does
-
-
-
+### What Aegis Actually Does
 ### Aegis is not a “smart model.”
 
 It is a:
