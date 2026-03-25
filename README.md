@@ -103,9 +103,8 @@ if __name__ == "__main__":
 ```
 
 
-Decision Matrix (P_net Interpretation)
-
-## P_net = Net Epistemic Pressure
+## Decision Matrix (P_net Interpretation)
+P_net = Net Epistemic Pressure
 Represents margin of safety for execution.
 
 ```mermaid
@@ -119,6 +118,9 @@ graph TD
     B -->|< -0.5| G[BLOCK]
 ```
 
+
+
+
 ## Operational Interpretation
 
 | P_net Range | Status         | Meaning                     | Action          |
@@ -128,6 +130,10 @@ graph TD
 | 0.0 – 1.0   | CONDITIONAL_GO | Fragile state               | Reduce exposure |
 | -0.5 – 0.0  | INSUFFICIENT   | Missing / unclear evidence  | Wait            |
 | < -0.5      | BLOCK          | Active risk / failure       | Stop            |
+
+
+
+
 
 
 Troubleshooting & Calibration
