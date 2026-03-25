@@ -11,7 +11,7 @@
 ## Installation
 ```bash
 # Clone the repository
-git clone [https://github.com/youruser/project_aegis.git](https://github.com/youruser/project_aegis.git)
+git clone [https://github.com/youruser/project_aegis.git](https://github.com/youruser/Project_Aegis.git)
 cd project_aegis
 
 ## Quick Start
