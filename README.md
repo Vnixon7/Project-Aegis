@@ -96,6 +96,29 @@ This guide explains how to interpret the mathematical outputs of the Aegis Arbit
 
 
 ## 1. The Decision Matrix: Interpreting $P_{net}$The $P_{net}$ score (Net Epistemic Pressure) represents the "Margin of Safety." While can_execute is a binary gate, the underlying score dictates the quality of the environment.
+
+graph TD
+    A[Arbiter Calculates Pnet] --> B{Pnet Value}
+    
+    B -->|> 2.0| C[Status: GO]
+    B -->|1.0 to 2.0| D[Status: GO]
+    B -->|0.0 to 1.0| E[Status: CONDITIONAL_GO]
+    B -->|-0.5 to 0.0| F[Status: INSUFFICIENT]
+    B -->|< -0.5| G[Status: BLOCK]
+
+    C --> C1(Action: Standard Execution)
+    D --> D1(Action: Standard Execution)
+    E --> E1(Action: Reduce Position Size)
+    F --> F1(Action: Hold for Fresh Evidence)
+    G --> G1(Action: Hard Stop / Investigate)
+
+    style C fill:#d4edda,stroke:#155724
+    style D fill:#d4edda,stroke:#155724
+    style E fill:#fff3cd,stroke:#856404
+    style F fill:#e2e3e5,stroke:#383d41
+    style G fill:#f8d7da,stroke:#721c24
+
+
 ```mermaid
 Pnet​           Range	       Status	            Meaning	                                                    Operational Action
 > 2.0	       GO	           Strong Consensus.    High-tier facts are present with near-zero entropy.	        Standard automated execution.
