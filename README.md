@@ -13,15 +13,15 @@
 # Clone the repository
 git clone [https://github.com/youruser/project_aegis.git](https://github.com/youruser/Project_Aegis.git)
 cd project_aegis
+```
 
 ## Quick Start
 Run python main.py to see the system handle a high-entropy "Network Flap" scenario.
 
 
----
-
 ### 2. main.py
 This is your functional entry point. It simulates a "Fragile Success" scenario where a successful load test is undermined by rising network risks.
+
 
 ```python
 from datetime import datetime
