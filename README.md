@@ -1,30 +1,48 @@
 # Project Aegis: Epistemic Decision Gating
 
-**Aegis** is a deterministic safety layer for autonomous systems (Trading, ML Deployment, Robotics). Unlike traditional "if-then" logic, Aegis models **uncertainty, missingness, and signal integrity** to prevent actions when the environment is unstable.
+**Aegis** is a deterministic decision governance layer for autonomous systems (Trading, ML Deployment, Robotics).  
+It enforces **truth-first execution** by modeling uncertainty, missingness, and signal integrity—blocking actions when the environment is unstable.
+
+---
 
 ## Core Architecture
-1. **Substrate:** A unified contract representing the system's "belief" about reality.
-2. **Integrity Tiers:** Evidence is weighted by its source (Tier 1: Signed Artifacts → Tier 4: Human Assertions).
-3. **MAER (Multi-Agent Epistemic Reasoning):** A Proponent and Dissenter argue over the substrate; an Arbiter calculates the mathematical net pressure ($P_{net}$).
-4. **Convergence Monitor:** Detects "thrashing" (oscillating decisions) and triggers a `SUBSTRATE_FREEZE`.
+
+1. **Substrate**
+   - A unified contract representing the system’s belief about reality.
+
+2. **Integrity Tiers**
+   - Evidence is weighted by source reliability:
+     - Tier 1 → Signed Artifacts (highest trust)
+     - Tier 4 → Human Assertions (lowest trust)
+
+3. **MAER (Multi-Agent Epistemic Reasoning)**
+   - Proponent → argues for action
+   - Dissenter → argues against action
+   - Arbiter → computes net pressure (`P_net`)
+
+4. **Convergence Monitor**
+   - Detects instability (“thrashing”)
+   - Can trigger `SUBSTRATE_FREEZE`
+
+---
 
 ## Installation
 ```bash
-# Clone the repository
-git clone [https://github.com/youruser/project_aegis.git](https://github.com/youruser/Project_Aegis.git)
+git clone https://github.com/youruser/Project_Aegis.git
 cd project_aegis
 ```
 
 ## Quick Start
-Run python main.py to see the system handle a high-entropy "Network Flap" scenario.
 
+Run:
+```bash
+python main.py
+```
 
-### 2. main.py
-This is your functional entry point. It simulates a "Fragile Success" scenario where a successful load test is undermined by rising network risks.
+This simulates a high-entropy network instability scenario where Aegis blocks unsafe execution.
 
-
+## Example: main.py
 ```python
-from datetime import datetime
 from dataclasses import dataclass
 from aegis.schema import DecisionStatus, ExecutionStatus, IntegrityTier
 from aegis.gatekeeper import DefaultGateway
@@ -32,13 +50,13 @@ from aegis.targeting import DefaultTargeting
 from aegis.engine import Arbiter, ConvergenceMonitor
 from aegis.controller import AegisController
 
-# 1. Define Environment Policy
+# 1. Environment Policy
 @dataclass
 class TradingPolicy:
-    go_threshold: float = 1.0     # Required P_net to allow trade
-    block_threshold: float = -0.5 # P_net that triggers a hard stop
+    go_threshold: float = 1.0
+    block_threshold: float = -0.5
 
-# 2. Mock Evidence Artifact (What your sensors send to Aegis)
+# 2. Evidence Artifact
 @dataclass
 class EvidenceArtifact:
     probe_id: str
@@ -48,7 +66,6 @@ class EvidenceArtifact:
     content: dict
 
 def run_simulation():
-    # Initialize the Epistemic Stack
     aegis = AegisController(
         gateway=DefaultGateway(),
         targeting=DefaultTargeting(),
@@ -57,10 +74,9 @@ def run_simulation():
         policy=TradingPolicy()
     )
 
-    print(f"{'Tick':<5} | {'Artifact Status':<15} | {'Aegis Decision':<20} | {'Execute?'}")
-    print("-" * 65)
+    print(f"{'Tick':<5} | {'Artifact Status':<15} | {'Decision':<20} | {'Execute'}")
+    print("-" * 70)
 
-    # SCENARIO: A stable system that begins to "Thrash" due to a flaky network probe
     scenarios = [
         EvidenceArtifact("NET_PROBE", ExecutionStatus.SUCCESS, IntegrityTier.TIER_1, 0.95, {"latency": "5ms"}),
         EvidenceArtifact("NET_PROBE", ExecutionStatus.TIMEOUT, IntegrityTier.TIER_1, 0.0, {}),
@@ -69,19 +85,17 @@ def run_simulation():
     ]
 
     for i, artifact in enumerate(scenarios):
-        # The 'tick' is the atomic unit of Aegis reasoning
         result = aegis.tick([artifact])
-        
-        tick_num = i + 1
-        status_str = artifact.status.value
-        decision = result["status"].value
-        can_exec = "YES" if result["can_execute"] else "NO"
-        
-        print(f"{tick_num:<5} | {status_str:<15} | {decision:<20} | {can_exec}")
 
-    print("-" * 65)
-    print("Simulation Complete: Aegis detected instability and enforced a SUBSTRATE_FREEZE.")
+        print(
+            f"{i+1:<5} | "
+            f"{artifact.status.value:<15} | "
+            f"{result.status.value:<20} | "
+            f"{'YES' if result.can_execute else 'NO'}"
+        )
 
+    print("-" * 70)
+    print("Simulation Complete: Aegis enforced a SUBSTRATE_FREEZE due to instability.")
 
 if __name__ == "__main__":
     run_simulation()
@@ -89,82 +103,112 @@ if __name__ == "__main__":
 ```
 
 
-## Aegis Troubleshooting & Epistemic Calibration
+Decision Matrix (P_net Interpretation)
 
-This guide explains how to interpret the mathematical outputs of the Aegis Arbiter and how to resolve common system deadlocks.
-
-
-
-## 1. The Decision Matrix: Interpreting $P_{net}$The $P_{net}$ score (Net Epistemic Pressure) represents the "Margin of Safety." While can_execute is a binary gate, the underlying score dictates the quality of the environment.
-
-graph TD
-    A[Arbiter Calculates Pnet] --> B{Pnet Value}
-    
-    B -->|> 2.0| C[Status: GO]
-    B -->|1.0 to 2.0| D[Status: GO]
-    B -->|0.0 to 1.0| E[Status: CONDITIONAL_GO]
-    B -->|-0.5 to 0.0| F[Status: INSUFFICIENT]
-    B -->|< -0.5| G[Status: BLOCK]
-
-    C --> C1(Action: Standard Execution)
-    D --> D1(Action: Standard Execution)
-    E --> E1(Action: Reduce Position Size)
-    F --> F1(Action: Hold for Fresh Evidence)
-    G --> G1(Action: Hard Stop / Investigate)
-
-    style C fill:#d4edda,stroke:#155724
-    style D fill:#d4edda,stroke:#155724
-    style E fill:#fff3cd,stroke:#856404
-    style F fill:#e2e3e5,stroke:#383d41
-    style G fill:#f8d7da,stroke:#721c24
-
+## P_net = Net Epistemic Pressure
+Represents margin of safety for execution.
 
 ```mermaid
-Pnet​           Range	       Status	            Meaning	                                                    Operational Action
-> 2.0	       GO	           Strong Consensus.    High-tier facts are present with near-zero entropy.	        Standard automated execution.
-1.0 to 2.0	   GO	           Nominal Safety.      Basic requirements met; standard noise levels.	            Standard automated execution.
-0.0 to 1.0	   CONDITIONAL_GO  Fragile State.       Proponent outweighs Dissenter, but the margin is thin.      Warning: Reduce position size / increase monitoring.
--0.5 to 0.0	   INSUFFICIENT	   Opaque Reality.      Evidence is missing or too stale to calculate a safe path.  Hold: System waits for fresh artifacts.
-< -0.5	       BLOCK	       Active Hostility.    Risks or tool failures outweigh successes.	                Stop: Hard execution block. Investigate logs.
+graph TD
+    A[Arbiter Calculates P_net] --> B{P_net Value}
+
+    B -->|> 2.0| C[GO]
+    B -->|1.0 to 2.0| D[GO]
+    B -->|0.0 to 1.0| E[CONDITIONAL_GO]
+    B -->|-0.5 to 0.0| F[INSUFFICIENT]
+    B -->|< -0.5| G[BLOCK]
 ```
-## 2. Common System States & Fixes
+
+## Operational Interpretation
+
+| P_net Range | Status         | Meaning                     | Action          |
+| ----------- | -------------- | --------------------------- | --------------- |
+| > 2.0       | GO             | Strong consensus            | Execute         |
+| 1.0 – 2.0   | GO             | Normal operating conditions | Execute         |
+| 0.0 – 1.0   | CONDITIONAL_GO | Fragile state               | Reduce exposure |
+| -0.5 – 0.0  | INSUFFICIENT   | Missing / unclear evidence  | Wait            |
+| < -0.5      | BLOCK          | Active risk / failure       | Stop            |
 
 
-State: Stuck in INSUFFICIENT_EVIDENCE
-Symptom: The system refuses to move to GO despite "good" data.
+Troubleshooting & Calibration
+1. INSUFFICIENT_EVIDENCE
 
-The Cause: A Critical flag is active in the sc.missingness registry. Aegis follows a Short-Circuit Invariant: if a required probe is missing, no amount of other "Success" data can override it.
+Symptom: System won’t move to GO
+Cause: Missing critical probe
 
-Resolution: 
-1.  Check AegisAction.dominant_anchors to see which probe is missing.
-2.  Verify the sensor/tool is actually reporting to the Gateway.
-3.  If the probe is no longer relevant, update your TargetingEngine to remove the requirement.
+Fix:
 
-State: SUBSTRATE_FREEZE (The Thrash Trigger)
-Symptom: The status flips to SUBSTRATE_FREEZE and stops all processing.
+Check dominant_anchors
+Verify sensor reporting
+Remove stale requirements if needed
+2. SUBSTRATE_FREEZE
 
-The Cause: The ConvergenceMonitor detected too many status flips (e.g., GO -> BLOCK -> GO) within the defined window. This indicates Sensory Turbulence.
+Symptom: System halts execution
+Cause: Rapid oscillation (thrashing)
 
-Resolution: 
-1.  Do not immediately restart. Identify the "Flapping" sensor.
-2.  Wait for the environment to stabilize (The "Cooling Period").
-3.  Use a Tier-4 Assertion (Human Override) to acknowledge the volatility and force a transition to DIAGNOSTIC_MODE.
+Fix:
 
-State: BLOCK despite Human (Tier-4) Success
-Symptom: You manually told the system it is "OK," but it still returns BLOCK.
+Identify unstable signal
+Wait for stabilization
+Optionally apply Tier-4 override → DIAGNOSTIC mode
+3. BLOCK Despite Human Override
 
-The Cause: Tier Weighting. A Tier-4 Assertion has a weight of 0.2. A Tier-1 Tool Crash or Risk has a weight of 1.0.
+Symptom: You say “GO,” system still blocks
+Cause: Tier weighting
 
-Resolution: Aegis is designed to trust automated, signed telemetry over human "guesses." To override a Tier-1 Risk, you must provide multiple corroborating assertions or fix the underlying Tier-1 evidence source.
+Tier 1 = strong
+Tier 4 = weak
+
+Fix:
+
+Provide corroborating evidence
+Fix underlying system signal
+Policy Tuning
+
+Adjust system sensitivity:
+
+Increase go_threshold → more conservative
+Decrease block_threshold → more tolerant
+Increase ConvergenceMonitor.threshold → reduce freeze sensitivity
+What Aegis Actually Does
+
+Aegis is not a “smart model.”
+
+It is a:
+
+Deterministic execution gate that prevents unsafe actions under uncertainty
+
+It ensures:
+
+No action without sufficient evidence
+No action during instability
+No action when critical data is missing
+
+
+## Key Output
+```python
+AegisAction(
+    status=DecisionStatus,
+    p_net=float,
+    dominant_anchors=list[str],
+    trace=str,
+    can_execute=bool
+)
+```
+
+## Core Principle
+
+If reality is uncertain, unstable, or incomplete.........do nothing.
 
 
 
-## 3. Tuning Your Policy
 
-If Aegis is being "too sensitive" or "too reckless," adjust your Policy thresholds:
 
-Increase go_threshold: If you want the system to be more skeptical (requires more evidence to act).
 
-Decrease block_threshold: If you want to allow the system to tolerate more minor risks before stopping.
 
-Adjust ConvergenceMonitor(threshold=N): Increase N if your environment is naturally noisy but you want to avoid frequent Freezes.
+
+
+
+
+
+
