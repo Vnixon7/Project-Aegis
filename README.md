@@ -188,15 +188,15 @@ graph TD
 ### What Aegis Actually Does
 ### Aegis is not a “smart model.”
 
-It is a:
+- It is a:
 
-Deterministic execution gate that prevents unsafe actions under uncertainty
+   Deterministic execution gate that prevents unsafe actions under uncertainty
 
-It ensures:
+- It ensures:
 
-No action without sufficient evidence
-No action during instability
-No action when critical data is missing
+   No action without sufficient evidence
+   No action during instability
+   No action when critical data is missing
 
 
 ## Key Output
