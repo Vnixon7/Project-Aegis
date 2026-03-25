@@ -140,6 +140,7 @@ Troubleshooting & Calibration
 1. INSUFFICIENT_EVIDENCE
 
 Symptom: System won’t move to GO
+
 Cause: Missing critical probe
 
 Fix:
@@ -150,6 +151,7 @@ Remove stale requirements if needed
 2. SUBSTRATE_FREEZE
 
 Symptom: System halts execution
+
 Cause: Rapid oscillation (thrashing)
 
 Fix:
@@ -160,6 +162,7 @@ Optionally apply Tier-4 override → DIAGNOSTIC mode
 3. BLOCK Despite Human Override
 
 Symptom: You say “GO,” system still blocks
+
 Cause: Tier weighting
 
 Tier 1 = strong
