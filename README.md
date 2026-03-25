@@ -20,7 +20,7 @@ Run python main.py to see the system handle a high-entropy "Network Flap" scenar
 
 ---
 
-### 2. `main.py`
+### 2. main.py
 This is your functional entry point. It simulates a "Fragile Success" scenario where a successful load test is undermined by rising network risks.
 
 ```python
