@@ -96,14 +96,14 @@ This guide explains how to interpret the mathematical outputs of the Aegis Arbit
 
 
 ## 1. The Decision Matrix: Interpreting $P_{net}$The $P_{net}$ score (Net Epistemic Pressure) represents the "Margin of Safety." While can_execute is a binary gate, the underlying score dictates the quality of the environment.
-
+```mermaid
 Pnet​           Range	       Status	            Meaning	                                                    Operational Action
 > 2.0	       GO	           Strong Consensus.    High-tier facts are present with near-zero entropy.	        Standard automated execution.
 1.0 to 2.0	   GO	           Nominal Safety.      Basic requirements met; standard noise levels.	            Standard automated execution.
 0.0 to 1.0	   CONDITIONAL_GO  Fragile State.       Proponent outweighs Dissenter, but the margin is thin.      Warning: Reduce position size / increase monitoring.
 -0.5 to 0.0	   INSUFFICIENT	   Opaque Reality.      Evidence is missing or too stale to calculate a safe path.  Hold: System waits for fresh artifacts.
 < -0.5	       BLOCK	       Active Hostility.    Risks or tool failures outweigh successes.	                Stop: Hard execution block. Investigate logs.
-
+```
 ## 2. Common System States & Fixes
 
 
