@@ -136,8 +136,10 @@ graph TD
 
 
 
-Troubleshooting & Calibration
-1. INSUFFICIENT_EVIDENCE
+## Troubleshooting & Calibration
+
+
+# 1. INSUFFICIENT_EVIDENCE
 
 Symptom: System won’t move to GO
 
@@ -148,7 +150,8 @@ Fix:
 Check dominant_anchors
 Verify sensor reporting
 Remove stale requirements if needed
-2. SUBSTRATE_FREEZE
+
+# 2. SUBSTRATE_FREEZE
 
 Symptom: System halts execution
 
@@ -159,7 +162,8 @@ Fix:
 Identify unstable signal
 Wait for stabilization
 Optionally apply Tier-4 override → DIAGNOSTIC mode
-3. BLOCK Despite Human Override
+
+# 3. BLOCK Despite Human Override
 
 Symptom: You say “GO,” system still blocks
 
