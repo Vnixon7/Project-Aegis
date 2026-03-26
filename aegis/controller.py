@@ -1,21 +1,48 @@
-from aegis.schema import SubstrateContract, DecisionStatus
+from __future__ import annotations
+
+from typing import Any, Iterable, Optional
+
+from aegis.schema import AegisAction, DecisionStatus, SubstrateContract, Tier4Assertion
+
 
 class AegisController:
-    def __init__(self, gateway, targeting, arbiter, monitor, policy):
-        self.gateway, self.targeting = gateway, targeting
-        self.arbiter, self.monitor = arbiter, monitor
-        self.policy = policy
-        self.sc = SubstrateContract()
+    """Orchestration-only controller for Project Aegis."""
 
-    def tick(self, artifacts):
-        for art in artifacts:
-            self.sc = self.gateway.process(art, self.sc)
-            
-        p_args = self.targeting.rank_for_proponent(self.sc)
-        d_args = self.targeting.rank_for_dissenter(self.sc)
-        
-        status, p_net = self.arbiter.resolve(self.sc, p_args, d_args, self.policy)
-        override = self.monitor.evaluate(status)
-        final_status = override or status
-        
-        return {"status": final_status, "can_execute": final_status == DecisionStatus.GO, "p_net": p_net}
+    def __init__(self, gateway, targeting, arbiter, monitor, policy):
+        self.gateway = gateway
+        self.targeting = targeting
+        self.arbiter = arbiter
+        self.monitor = monitor
+        self.policy = policy
+        self.sc: Optional[SubstrateContract] = None
+
+    def tick(self, artifacts: Iterable[Any]) -> AegisAction:
+        # 1. Ingest artifacts into the substrate.
+        for artifact in artifacts:
+            self.sc = self.gateway.process(artifact, self.sc)
+
+        assert self.sc is not None, "Substrate must exist after gateway processing."
+
+        # 2. Build deterministic arguments from the current substrate.
+        p_args = self.targeting.build_proponent_arguments(self.sc)
+        d_args = self.targeting.build_dissenter_arguments(self.sc)
+
+        # 3. Resolve arguments mathematically.
+        resolution = self.arbiter.resolve(self.sc, p_args, d_args, self.policy)
+
+        # 4. Apply temporal guardrails.
+        stability_override = self.monitor.evaluate(resolution)
+        final_status = stability_override or resolution.status
+
+        # 5. Emit hard execution gate.
+        return AegisAction(
+            status=final_status,
+            p_net=resolution.p_net,
+            dominant_anchors=resolution.dominant_anchors,
+            trace=resolution.reason,
+            can_execute=final_status == DecisionStatus.GO,
+        )
+
+    def force_thaw(self, human_assertion: Tier4Assertion) -> None:
+        """Placeholder for a formal Tier-4 freeze recovery path."""
+        raise NotImplementedError("Tier-4 thaw protocol is not yet implemented.")
